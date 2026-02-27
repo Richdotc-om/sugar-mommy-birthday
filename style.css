@@ -168,7 +168,8 @@ body {
   border: 2px solid rgba(255,179,208,0.4);
   position: fixed;
   z-index: 999;
-  transition: left 0.12s ease, top 0.12s ease;
+  display: none;
+  transition: left 0.15s ease, top 0.15s ease;
 }
 
 #payment-section {
