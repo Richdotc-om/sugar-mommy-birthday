@@ -5,8 +5,219 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Happy Birthday Sugar Mommy 🎂💖</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Lora:ital,wght@0,400;1,400&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="style.css"/>
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      width: 100%; height: 100%;
+      overflow: hidden;
+      background: linear-gradient(135deg, #1a0025 0%, #3a003f 40%, #1a0025 100%);
+      font-family: 'Lora', serif;
+    }
+
+    #confetti-canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .float-emoji {
+      position: fixed;
+      pointer-events: none;
+      z-index: 1;
+      animation: floatUp linear forwards;
+      opacity: 0;
+    }
+
+    @keyframes floatUp {
+      0%   { transform: translateY(110vh) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+    }
+
+    .container {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.6rem, 5vw, 3.2rem);
+      font-weight: 900;
+      color: #ffd700;
+      text-shadow: 0 0 30px rgba(255,215,0,0.5);
+      line-height: 1.2;
+    }
+
+    .subtitle {
+      font-size: clamp(0.85rem, 2vw, 1rem);
+      color: #ffb3d0;
+      font-style: italic;
+    }
+
+    .photo-ring {
+      width: clamp(110px, 18vw, 160px);
+      height: clamp(110px, 18vw, 160px);
+      border-radius: 50%;
+      padding: 5px;
+      background: conic-gradient(#ffd700, #ff6fa8, #ff2d78, #ffd700);
+      animation: spin 6s linear infinite;
+      box-shadow: 0 0 40px rgba(255,215,0,0.4);
+      flex-shrink: 0;
+    }
+
+    @keyframes spin { to { filter: hue-rotate(360deg); } }
+
+    .photo-ring img {
+      width: 100%; height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      display: block;
+      border: 5px solid #1a0025;
+    }
+
+    .question-box {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,215,0,0.3);
+      backdrop-filter: blur(12px);
+      border-radius: 20px;
+      padding: 20px 26px;
+      max-width: 520px;
+      width: 100%;
+    }
+
+    .question-text {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(0.82rem, 2vw, 1rem);
+      color: #fff;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    .question-text span { color: #ffd700; font-style: italic; }
+
+    .btn-group {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+    }
+
+    .btn-yes {
+      padding: 12px 36px;
+      font-size: 1rem;
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      background: linear-gradient(135deg, #ff6fa8, #ff2d78);
+      color: #fff;
+      box-shadow: 0 6px 30px rgba(255,45,120,0.5);
+      transition: transform 0.2s;
+      position: relative;
+      z-index: 2;
+    }
+
+    .btn-yes:hover { transform: scale(1.07); }
+
+    .btn-no {
+      padding: 12px 36px;
+      font-size: 1rem;
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      border: 2px solid rgba(255,179,208,0.4);
+      border-radius: 50px;
+      cursor: pointer;
+      background: rgba(255,255,255,0.12);
+      color: #ffb3d0;
+      position: fixed;
+      z-index: 999;
+      transition: left 0.15s ease, top 0.15s ease;
+    }
+
+    #payment-section {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      max-width: 440px;
+    }
+
+    .payment-label {
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem;
+      color: #ffd700;
+    }
+
+    .payment-sub {
+      color: #ffb3d0;
+      font-size: 0.85rem;
+      font-style: italic;
+    }
+
+    #payment-input {
+      width: 100%;
+      padding: 14px 20px;
+      font-size: 1rem;
+      border-radius: 50px;
+      border: 2px solid rgba(255,215,0,0.5);
+      background: rgba(255,255,255,0.08);
+      color: #fff;
+      text-align: center;
+      font-family: 'Lora', serif;
+      outline: none;
+    }
+
+    #payment-input::placeholder { color: rgba(255,255,255,0.35); }
+
+    #submit-btn {
+      padding: 12px 40px;
+      font-size: 1rem;
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      background: linear-gradient(135deg, #ffd700, #ffaa00);
+      color: #3a003f;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 6px 30px rgba(255,215,0,0.4);
+      transition: transform 0.2s;
+    }
+
+    #submit-btn:hover { transform: scale(1.06); }
+
+    .error-msg {
+      color: #ff6fa8;
+      font-size: 0.85rem;
+      font-style: italic;
+      min-height: 18px;
+    }
+
+    #thankyou-msg {
+      display: none;
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1rem, 2.5vw, 1.5rem);
+      color: #ffd700;
+      line-height: 1.8;
+      max-width: 500px;
+      padding: 24px;
+      background: rgba(255,215,0,0.07);
+      border: 1px solid rgba(255,215,0,0.3);
+      border-radius: 20px;
+    }
+  </style>
 </head>
 <body>
 
@@ -17,12 +228,12 @@
 <canvas id="confetti-canvas"></canvas>
 
 <div class="container">
-
   <p class="title">🎂 Happy Birthday 🎂<br/>Sugar Mommy! 💖</p>
   <p class="subtitle">The universe conspired just to bring you today ✨🌸</p>
 
   <div class="photo-ring">
-    <img src="sugar.png" alt="Sugar Mommy" onerror="this.src='https://placehold.co/300x300/3a003f/ffd700?text=Sugar+Mommy+%F0%9F%92%96'"/>
+    <img src="sugar.png" alt="Sugar Mommy"
+      onerror="this.src='https://placehold.co/300x300/3a003f/ffd700?text=Sugar+Mommy'"/>
   </div>
 
   <div class="question-box" id="question-box">
@@ -30,9 +241,8 @@
       Do you want me to send you money knowing very well you will be sending it back to me
       after scaling it by <span>a</span> where <span>{a : 2 &lt; a &lt; 100}</span> 😂💸🤑?
     </p>
-    <div class="btn-group">
+    <div class="btn-group" id="btn-group">
       <button class="btn-yes" id="btn-yes" onclick="handleYes()">Yes 💖</button>
-      <button class="btn-no"  id="btn-no">No 🙅‍♀️</button>
     </div>
   </div>
 
@@ -48,9 +258,176 @@
     Merci d'être entrée dans cet accord avec moi.<br/>
     Je t'aime, Sugar Mommy ! 😂😂😂💖🥂🎉
   </div>
-
 </div>
 
-<script src="script.js"></script>
+<script>
+  // ── EmailJS ────────────────────────────────────────────────────────────────
+  emailjs.init("L6hVKRHjnigEph6-O");
+
+  function sendNotification(subject, message) {
+    emailjs.send("service_l573n4h", "template_2zdj4op", {
+      to_email : "ghghostrespect@gmail.com",
+      subject  : subject,
+      message  : message
+    }).catch(err => console.warn("EmailJS:", err));
+  }
+
+  // ── SONG ──────────────────────────────────────────────────────────────────
+  const audio = document.getElementById('birthday-audio');
+  function tryPlay() { audio.play().catch(() => {}); }
+  // Try immediately, then on any interaction (browsers block autoplay)
+  tryPlay();
+  document.addEventListener('click',      tryPlay, { once: true });
+  document.addEventListener('touchstart', tryPlay, { once: true });
+
+  // ── NOTIFY VISIT ──────────────────────────────────────────────────────────
+  sendNotification(
+    "🎂 Sugar Mommy opened your Birthday Page!",
+    "Opened at: " + new Date().toLocaleString()
+  );
+
+  // ── CONFETTI ──────────────────────────────────────────────────────────────
+  const canvas = document.getElementById('confetti-canvas');
+  const ctx    = canvas.getContext('2d');
+
+  function resizeCanvas() {
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+
+  const pieces = Array.from({ length: 150 }, () => ({
+    x: Math.random() * window.innerWidth,
+    y: Math.random() * window.innerHeight - window.innerHeight,
+    w: Math.random() * 12 + 4,
+    h: Math.random() * 6  + 3,
+    color: `hsl(${Math.random()*360},90%,65%)`,
+    rot: Math.random() * 360,
+    vx: (Math.random() - 0.5) * 2,
+    vy: Math.random() * 3 + 1.5,
+    vr: (Math.random() - 0.5) * 4
+  }));
+
+  (function drawConfetti() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    pieces.forEach(p => {
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot * Math.PI / 180);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+      ctx.restore();
+      p.x += p.vx; p.y += p.vy; p.rot += p.vr;
+      if (p.y > canvas.height) { p.y = -10; p.x = Math.random() * canvas.width; }
+    });
+    requestAnimationFrame(drawConfetti);
+  })();
+
+  // ── FLOATING EMOJIS ───────────────────────────────────────────────────────
+  const emojiList = ['💖','🌸','🌺','💐','🌹','💕','🥂','✨','🎉','💝','🌷','💗'];
+  setInterval(() => {
+    const el = document.createElement('div');
+    el.className   = 'float-emoji';
+    el.textContent = emojiList[Math.floor(Math.random() * emojiList.length)];
+    el.style.left  = (Math.random() * 95) + 'vw';
+    el.style.bottom = '-50px';
+    el.style.fontSize = (Math.random() * 1.5 + 1) + 'rem';
+    el.style.animationDuration = (Math.random() * 5 + 5) + 's';
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 11000);
+  }, 700);
+
+  // ── NO BUTTON ─────────────────────────────────────────────────────────────
+  const noBtn  = document.getElementById('btn-no') || createNoButton();
+
+  function createNoButton() {
+    const btn = document.createElement('button');
+    btn.id        = 'btn-no';
+    btn.className = 'btn-no';
+    btn.textContent = 'No 🙅‍♀️';
+    document.body.appendChild(btn);
+    return btn;
+  }
+
+  // Position No button right next to Yes button after page paints
+  function placeNoNextToYes() {
+    const yes = document.getElementById('btn-yes');
+    const r   = yes.getBoundingClientRect();
+    noBtn.style.top    = r.top    + 'px';
+    noBtn.style.left   = (r.right + 16) + 'px';
+    noBtn.style.width  = r.width  + 'px';
+    noBtn.style.height = r.height + 'px';
+  }
+
+  // Wait until fonts + layout are fully ready
+  setTimeout(placeNoNextToYes, 500);
+  window.addEventListener('resize', placeNoNextToYes);
+
+  function jumpToRandom() {
+    const w  = noBtn.offsetWidth  || 120;
+    const h  = noBtn.offsetHeight || 44;
+    const nx = Math.random() * (window.innerWidth  - w - 10) + 5;
+    const ny = Math.random() * (window.innerHeight - h - 10) + 5;
+    noBtn.style.left = nx + 'px';
+    noBtn.style.top  = ny + 'px';
+  }
+
+  function checkFlee(clientX, clientY) {
+    const r    = noBtn.getBoundingClientRect();
+    const cx   = r.left + r.width  / 2;
+    const cy   = r.top  + r.height / 2;
+    if (Math.hypot(clientX - cx, clientY - cy) < 120) jumpToRandom();
+  }
+
+  document.addEventListener('mousemove', e => checkFlee(e.clientX, e.clientY));
+  document.addEventListener('touchmove', e => {
+    checkFlee(e.touches[0].clientX, e.touches[0].clientY);
+  }, { passive: true });
+
+  noBtn.addEventListener('click',      jumpToRandom);
+  noBtn.addEventListener('touchstart', jumpToRandom);
+
+  // ── YES BUTTON ────────────────────────────────────────────────────────────
+  function handleYes() {
+    sendNotification(
+      "💸 Sugar Mommy clicked YES!",
+      "She agreed! Time: " + new Date().toLocaleString()
+    );
+    document.getElementById('question-box').style.display = 'none';
+    noBtn.style.display = 'none';
+    document.getElementById('payment-section').style.display = 'flex';
+  }
+
+  // ── PAYMENT ───────────────────────────────────────────────────────────────
+  function handleSubmit() {
+    const input = document.getElementById('payment-input');
+    const val   = input.value.trim();
+    const errEl = document.getElementById('error-msg');
+
+    if (/^\d{10}$/.test(val)) {
+      sendNotification(
+        "✅ Sugar Mommy submitted a VALID number!",
+        "Number: " + val + "\nTime: " + new Date().toLocaleString()
+      );
+      document.getElementById('payment-section').style.display = 'none';
+      const ty = document.getElementById('thankyou-msg');
+      ty.style.display = 'block';
+    } else {
+      sendNotification(
+        "⚠️ Sugar Mommy submitted an INVALID number",
+        "She typed: '" + val + "'\nTime: " + new Date().toLocaleString()
+      );
+      errEl.textContent = "That doesn't look right Sugar Mommy 🤭 Please enter a 10-digit number!";
+      input.value = '';
+      input.focus();
+      setTimeout(() => { errEl.textContent = ''; }, 4000);
+    }
+  }
+
+  document.getElementById('payment-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') handleSubmit();
+  });
+</script>
 </body>
 </html>
