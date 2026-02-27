@@ -89,84 +89,35 @@ function spawnFloatingEmojis() {
   }, 600);
 }
 
-// ── NO BUTTON (sits on Yes, flees on hover/touch) ────────────────────────────
+// ── NO BUTTON ────────────────────────────────────────────────────────────────
 function initNoButton() {
   const noBtn  = document.getElementById('btn-no');
   const yesBtn = document.getElementById('btn-yes');
 
-  // Place No button exactly over Yes button
-  function snapToYes() {
+  // Wait for Yes button to be fully painted then position No beside it
+  requestAnimationFrame(() => {
     const r = yesBtn.getBoundingClientRect();
-    noBtn.style.left   = r.left + 'px';
-    noBtn.style.top    = r.top  + 'px';
-    noBtn.style.width  = r.width  + 'px';
-    noBtn.style.height = r.height + 'px';
+    noBtn.style.position = 'fixed';
+    noBtn.style.width    = r.width  + 'px';
+    noBtn.style.height   = r.height + 'px';
+    noBtn.style.left     = (r.right + 16) + 'px';  // 16px gap to the right of Yes
+    noBtn.style.top      = r.top + 'px';
+    noBtn.style.zIndex   = '999';
+    noBtn.style.transition = 'left 0.15s ease, top 0.15s ease';
+    noBtn.style.display  = 'block';
+  });
+
+  function jumpRandom() {
+    const w = noBtn.offsetWidth;
+    const h = noBtn.offsetHeight;
+    const nx = Math.random() * (window.innerWidth  - w);
+    const ny = Math.random() * (window.innerHeight - h);
+    noBtn.style.left = nx + 'px';
+    noBtn.style.top  = ny + 'px';
   }
-  snapToYes();
-  window.addEventListener('resize', snapToYes);
 
   function flee(clientX, clientY) {
     const r    = noBtn.getBoundingClientRect();
     const cx   = r.left + r.width  / 2;
     const cy   = r.top  + r.height / 2;
-    const dist = Math.hypot(clientX - cx, clientY - cy);
-
-    if (dist < 130) {
-      const angle = Math.atan2(cy - clientY, cx - clientX);
-      const push  = 160;
-      let nx = r.left + Math.cos(angle) * push;
-      let ny = r.top  + Math.sin(angle) * push;
-      // Keep fully on screen
-      nx = Math.max(0, Math.min(window.innerWidth  - r.width,  nx));
-      ny = Math.max(0, Math.min(window.innerHeight - r.height, ny));
-      noBtn.style.left = nx + 'px';
-      noBtn.style.top  = ny + 'px';
-    }
-  }
-
-  document.addEventListener('mousemove', e => flee(e.clientX, e.clientY));
-  document.addEventListener('touchmove', e => {
-    e.preventDefault();
-    flee(e.touches[0].clientX, e.touches[0].clientY);
-  }, { passive: false });
-}
-
-// ── YES BUTTON ────────────────────────────────────────────────────────────────
-function handleYes() {
-  sendNotification(
-    "💸 Sugar Mommy clicked YES!",
-    "She agreed to the money deal! Time: " + new Date().toLocaleString()
-  );
-  document.getElementById('question-box').style.display   = 'none';
-  document.getElementById('btn-no').style.display         = 'none';
-  document.getElementById('payment-section').classList.add('visible');
-}
-
-// ── PAYMENT SUBMISSION ────────────────────────────────────────────────────────
-function handleSubmit() {
-  const input = document.getElementById('payment-input');
-  const val   = input.value.trim();
-  const errEl = document.getElementById('error-msg');
-
-  if (/^\d{10}$/.test(val)) {
-    sendNotification(
-      "✅ Sugar Mommy submitted a VALID account number!",
-      "She submitted: " + val + "\nTime: " + new Date().toLocaleString()
-    );
-    document.getElementById('payment-section').style.display = 'none';
-    document.getElementById('thankyou-msg').classList.add('visible');
-  } else {
-    sendNotification(
-      "⚠️ Sugar Mommy submitted an INVALID number",
-      "She typed: '" + val + "'\nTime: " + new Date().toLocaleString()
-    );
-    errEl.textContent = "That doesn't look right Sugar Mommy 🤭 Please enter a 10-digit number!";
-    input.value = '';
-    input.focus();
-    setTimeout(() => { errEl.textContent = ''; }, 4000);
-  }
-}
-
-document.getElementById('payment-input').addEventListener('keydown', e => {
-  if (e.key === 'Enter') handleSubmit();
-});
+    const dist = Math.hypot(clientX
